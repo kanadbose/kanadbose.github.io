@@ -1,0 +1,2121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kanad Bose - Portfolio Preview</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://w.soundcloud.com/player/api.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Geom:ital,wght@0,300..900;1,300..900&family=Manrope:wght@400;500;600;700&family=SUSE+Mono:ital,wght@0,100..800;1,100..800&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      font-family: 'Manrope', sans-serif;
+      color: #eef2f1;
+      background: #a8b9b6;
+      font-synthesis: none;
+    }
+    * { box-sizing: border-box; }
+    html, body, #root { width: 100%; min-height: 100%; margin: 0; padding: 0; }
+    body { overflow: hidden; }
+    button, a { font: inherit; color: inherit; }
+    button { border: 0; cursor: pointer; }
+
+    .portfolio-shell {
+      --ink: #f5f7f6;
+      --muted: rgba(245,247,246,.68);
+      --line: rgba(245,247,246,.22);
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      height: 100svh;
+      min-height: 640px;
+      overflow: hidden;
+      background: #1e3d59;
+      isolation: isolate;
+      transition: background .7s ease;
+    }
+    .portfolio-shell.is-dark {
+      --ink: #e9eeee;
+      --muted: rgba(233,238,238,.65);
+      --line: rgba(233,238,238,.2);
+      background: #25383c;
+    }
+
+    .atmosphere {
+      position: absolute;
+      inset: -3%;
+      z-index: -3;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(.88) contrast(1.02) brightness(1.02);
+      transform: scale(1.07);
+      opacity: .92;
+      transition: filter .8s ease, opacity .8s ease, background-image .8s ease;
+      animation: drift 22s ease-in-out infinite alternate;
+    }
+    .is-dark .atmosphere {
+      filter: saturate(1.1) contrast(1.2) brightness(.50) hue-rotate(7deg);
+      opacity: 1.00;
+    }
+    .atmosphere::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(42,69,71,.54), rgba(123,149,145,.16) 55%, rgba(36,58,59,.48));
+    }
+
+    .grain {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: .09;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+      mix-blend-mode: soft-light;
+    }
+
+    .topbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 30px 42px;
+      z-index: 5;
+    }
+    .wordmark {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: lowercase;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      color: var(--ink);
+      transition: opacity .25s ease, transform .25s ease;
+      user-select: none;
+    }
+    .wordmark:hover {
+      opacity: .75;
+      transform: translateY(-1px);
+    }
+    .wordmark:active {
+      transform: translateY(0);
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      position: relative;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      width: 38px;
+      height: 22px;
+      padding: 2px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, .22);
+      background: rgba(255, 255, 255, .1);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      cursor: pointer;
+      outline: none;
+      user-select: none;
+      transition: background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+    }
+    .toggle-switch:hover {
+      background: rgba(255, 255, 255, .22);
+      border-color: rgba(255, 255, 255, .48);
+      transform: translateY(-1px);
+    }
+    .toggle-track-icons {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px;
+      pointer-events: none;
+      color: var(--muted);
+      opacity: .55;
+      transition: opacity .25s ease;
+    }
+    .toggle-switch:hover .toggle-track-icons {
+      opacity: .85;
+    }
+    .toggle-thumb {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.62);
+      backdrop-filter: blur(10px) saturate(160%);
+      -webkit-backdrop-filter: blur(10px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      color: #1a344d;
+      box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.95), 0 2px 6px rgba(0, 0, 0, 0.22);
+      transform: translateX(0);
+      transition: transform .35s cubic-bezier(.16, 1, .3, 1), background .3s ease, border-color .3s ease, color .3s ease, box-shadow .3s ease;
+    }
+    .is-dark .toggle-thumb {
+      background: rgba(18, 28, 38, 0.58);
+      backdrop-filter: blur(10px) saturate(160%);
+      -webkit-backdrop-filter: blur(10px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #f4f8f8;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.32), 0 2px 7px rgba(0, 0, 0, 0.52);
+    }
+    .toggle-switch.is-on .toggle-thumb {
+      transform: translateX(16px);
+    }
+    .sound-toggle.is-on .toggle-thumb {
+      color: #c85a2d;
+    }
+    .is-dark .sound-toggle.is-on .toggle-thumb {
+      color: #ffffff;
+    }
+
+    .scene {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .scene-location {
+      position: absolute;
+      left: 42px;
+      top: 50%;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: .12em;
+      color: var(--ink);
+      opacity: .78;
+      transform: translateY(-50%);
+      transition: opacity .45s cubic-bezier(.16,1,.3,1), transform .45s cubic-bezier(.16,1,.3,1);
+    }
+    .panel-open .scene-location {
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-25px, -50%);
+    }
+    .scene-location span {
+      display: block;
+      width: 5px;
+      height: 5px;
+      border: 1px solid var(--ink);
+      border-radius: 50%;
+    }
+
+    .navigation-stage {
+      width: min(600px, 42vw);
+      height: 540px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: transform .70s cubic-bezier(.16,1,.3,1);
+      will-change: transform;
+    }
+
+    .cylinder-nav {
+      position: relative;
+      width: 100%;
+      height: 480px;
+    }
+
+    .nav-item {
+      position: absolute;
+      left: 50%;
+      width: 100%;
+      padding: 0;
+      color: rgba(255,255,255,.76);
+      background: transparent;
+      text-align: center;
+      white-space: nowrap;
+      transition: top .7s cubic-bezier(.22,.8,.2,1), transform .70s cubic-bezier(.16,1,.3,1), opacity 1.2s ease, color .7s ease, filter .7s ease;
+    }
+    .nav-item.is-fading-out {
+      transition: top .7s cubic-bezier(.22,.8,.2,1), transform .70s cubic-bezier(.16,1,.3,1), opacity 0.2s ease, color .7s ease, filter .7s ease;
+    }
+    .nav-item.is-fading-in {
+      transition: top .7s cubic-bezier(.22,.8,.2,1), transform .70s cubic-bezier(.16,1,.3,1), opacity 1.2s ease, color .7s ease, filter .7s ease;
+    }
+
+    .nav-item span {
+      display: inline-block;
+      font-family: 'SUSE Mono', monospace;
+      font-size: clamp(32px, 6.7vw, 96px);
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: -0.025em;
+      text-shadow: 0 1px 2px rgba(31,52,55,.22), 0 0 18px rgba(255,255,255,.38);
+      filter: blur(.1px);
+    }
+    .nav-item.is-current {
+      color: rgba(255,255,255,.98);
+    }
+    .nav-item.is-current span {
+      text-shadow: 0 1px 2px rgba(31,52,55,.24), 0 0 30px rgba(255,255,255,.62);
+    }
+
+    .portfolio-shell:not(.panel-open) .nav-item:not(.is-current) span {
+      font-size: clamp(25.6px, 5.36vw, 76.8px);
+    }
+
+    .language-word {
+      animation: language-crossfade 1.1s cubic-bezier(.22,.8,.2,1) both;
+    }
+
+    .nav-hint {
+      position: absolute;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 8px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      opacity: 0.8;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+    .nav-hint.top {
+      top: 42px;
+      animation: breathe 3.5s ease-in-out infinite;
+    }
+    .nav-hint.bottom {
+      bottom: 42px;
+      flex-direction: column-reverse;
+      animation: breathe 3.5s ease-in-out infinite;
+    }
+    .nav-hint.is-hidden,
+    .panel-open .nav-hint {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      animation: none !important;
+      transition: opacity 0.4s ease, visibility 0.4s ease !important;
+      pointer-events: none;
+    }
+
+    .scroll-hint {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity .85s ease, transform .85s ease;
+    }
+    .scroll-hint.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .scene-index {
+      position: absolute;
+      left: calc(50% + min(300px, 21vw) + 30px);
+      top: 50%;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: .08em;
+      opacity: .9;
+      transform: translateY(-50%);
+      transition: transform .70s cubic-bezier(.16,1,.3,1), font-size .70s cubic-bezier(.16,1,.3,1), opacity .35s ease;
+    }
+    .scene-index i {
+      width: 1px;
+      height: 42px;
+      background: var(--line);
+    }
+
+    .footer-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 42px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 8px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .footer-bar span:last-child {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .footer-center {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: .6;
+    }
+
+    .footer-sound-link {
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font: inherit;
+      color: inherit;
+      transition: color 0.2s;
+    }
+    .footer-sound-link:hover {
+      color: var(--ink);
+    }
+
+    .detail-panel {
+      position: absolute;
+      z-index: 4;
+      top: 12%;
+      right: 5.5%;
+      width: min(550px, 43vw);
+      height: 76%;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(35px) scale(.97);
+      transition: opacity 1s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1);
+      will-change: opacity, transform;
+    }
+    .panel-open .detail-panel {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0) scale(1);
+    }
+    .is-closing .detail-panel {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(20px) scale(.98);
+      transition: opacity .30s ease, transform .30s cubic-bezier(.4,0,.2,1);
+    }
+
+    .panel-inner {
+      height: 100%;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 26px;
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 26px;
+      background: linear-gradient(140deg, rgba(140, 140, 140, 0.1), rgba(110, 110, 110, 0.05));
+      box-shadow: inset 0 1px rgba(255,255,255,.26), 0 24px 80px rgba(10, 25, 35, 0.28);
+      backdrop-filter: blur(26px) saturate(140%);
+      -webkit-backdrop-filter: blur(26px) saturate(140%);
+      transition: border-color .4s ease, background .4s ease;
+    }
+    .is-dark .panel-inner {
+      background: linear-gradient(140deg, rgba(16, 30, 46, 0.2), rgba(10, 20, 32, 0.1));
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: inset 0 1px rgba(255,255,255,.2), 0 26px 90px rgba(0, 0, 0, 0.45);
+    }
+
+    .panel-topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+      margin-bottom: 12px;
+    }
+    .panel-top-actions {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .panel-action-btn {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 50%;
+      background: rgba(255,255,255,.1);
+      color: var(--ink);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      text-decoration: none;
+      user-select: none;
+      transition: transform .25s ease, background .25s ease, border-color .25s ease, color .25s ease;
+    }
+    .panel-action-btn:hover {
+      background: rgba(255,255,255,.24);
+      border-color: rgba(255,255,255,.52);
+      transform: translateY(-2px);
+    }
+    .panel-cv-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      line-height: 1;
+    }
+    .close-button {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 50%;
+      background: rgba(255,255,255,.1);
+      color: var(--ink);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transition: transform .25s ease, background .25s ease, border-color .25s ease;
+    }
+    .close-button:hover {
+      background: rgba(255,255,255,.24);
+      border-color: rgba(255,255,255,.52);
+      transform: translateY(-2px);
+    }
+
+    .panel-body {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      flex-direction: column;
+      justify-content: flex-start;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 4px 12px 15px 8px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,.44) transparent;
+    }
+    .panel-body::-webkit-scrollbar { width: 5px; }
+    .panel-body::-webkit-scrollbar-thumb {
+      border-radius: 99px;
+      background: rgba(255,255,255,.42);
+    }
+
+    .hello-photo-uploader {
+      display: block;
+      width: 100%;
+      aspect-ratio: 3 / 2;
+      flex-shrink: 0;
+      margin: 0 0 20px;
+      overflow: hidden;
+      border: 1px dashed rgba(255,255,255,.42);
+      border-radius: 18px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      transition: border-color .2s ease, background .2s ease;
+      position: relative;
+    }
+    .hello-photo-uploader img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 17px;
+    }
+
+    .panel-body h1 {
+      max-width: 460px;
+      margin: 0;
+      color: var(--ink);
+      font-size: clamp(24px, 3.8vw, 48px);
+      font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: -.06em;
+      flex-shrink: 0;
+    }
+
+    .panel-description {
+      max-width: 400px;
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+      flex-shrink: 0;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 24px;
+      flex-shrink: 0;
+    }
+    .tag-list span {
+      padding: 8px 11px;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 99px;
+      color: var(--muted);
+      font-size: 10px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .panel-tiles-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+      flex-shrink: 0;
+    }
+
+    .panel-tile {
+      display: flex;
+      flex-direction: column;
+      padding: 15px 17px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+      transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .panel-tile:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.38);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+    }
+    .is-dark .panel-tile {
+      background: rgba(255, 255, 255, 0.035);
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.28);
+    }
+    .is-dark .panel-tile:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.28);
+      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.4);
+    }
+
+    .panel-tile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .panel-tile-title {
+      font-family: 'Manrope', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+      margin: 0;
+      line-height: 1.25;
+    }
+
+    .panel-tile-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 9px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+    .panel-tile-link:hover {
+      background: rgba(255, 255, 255, 0.22);
+      border-color: rgba(255, 255, 255, 0.52);
+      transform: translateY(-1px);
+    }
+
+    .panel-tile-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 8.5px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .panel-tile-desc {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .panel-tile-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 10px;
+    }
+    .panel-tile-tags span {
+      font-family: 'DM Mono', monospace;
+      font-size: 8.5px;
+      letter-spacing: 0.03em;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--muted);
+    }
+
+    .panel-exp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .panel-exp-role {
+      font-family: 'Manrope', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+      margin: 0 0 4px 0;
+      line-height: 1.25;
+    }
+    .panel-exp-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+    }
+    .panel-exp-company {
+      color: var(--ink);
+      font-weight: 500;
+      opacity: 0.95;
+    }
+    .panel-exp-dot {
+      opacity: 0.45;
+    }
+    .panel-exp-location {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      opacity: 0.85;
+    }
+    .panel-exp-period {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      font-size: 8.5px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .panel-exp-desc {
+      margin-top: 4px;
+    }
+
+    .contact-links-group {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+      flex-shrink: 0;
+    }
+
+    .contact-pill-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 11px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.03em;
+      text-decoration: none;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+      width: fit-content;
+      max-width: 100%;
+      white-space: nowrap;
+    }
+    .contact-pill-link:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.48);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .enquiry-form-card {
+      margin-top: 24px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .is-dark .enquiry-form-card {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+
+    .enquiry-form-header {
+      font-family: 'DM Mono', monospace;
+      font-size: 9.5px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .enquiry-input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 600px) {
+      .enquiry-input-grid { grid-template-columns: 1fr; }
+    }
+
+    .enquiry-text-input,
+    .enquiry-textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 11px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--ink);
+      font-family: 'Manrope', sans-serif;
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+    .enquiry-text-input::placeholder,
+    .enquiry-textarea::placeholder {
+      color: var(--muted);
+      opacity: 0.7;
+    }
+    .enquiry-text-input:focus,
+    .enquiry-textarea:focus {
+      border-color: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+    }
+
+    .enquiry-textarea {
+      min-height: 80px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .enquiry-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .enquiry-send-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.14);
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+    .enquiry-send-btn:hover {
+      background: rgba(255, 255, 255, 0.28);
+      border-color: rgba(255, 255, 255, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .enquiry-success-box {
+      margin-top: 24px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(110, 231, 183, 0.4);
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--ink);
+      font-size: 12px;
+      line-height: 1.5;
+      backdrop-filter: blur(14px);
+    }
+    .enquiry-success-title {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #6ee7b7;
+      margin-bottom: 6px;
+    }
+
+    .panel-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+      margin-top: auto;
+      padding-top: 24px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      line-height: 1.5;
+      flex-shrink: 0;
+    }
+
+    .sc-soundscape-dock {
+      position: fixed;
+      bottom: 58px;
+      right: 42px;
+      width: 320px;
+      z-index: 50;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 18px;
+      background: rgba(28, 52, 75, 0.88);
+      backdrop-filter: blur(24px) saturate(130%);
+      -webkit-backdrop-filter: blur(24px) saturate(130%);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.38);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: transform 0.4s cubic-bezier(.16, 1, .3, 1), opacity 0.3s ease;
+      transform: translateY(0) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .is-dark .sc-soundscape-dock {
+      background: rgba(20, 32, 44, 0.9);
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
+    }
+    .sc-soundscape-dock.is-hidden {
+      transform: translateY(16px) scale(0.96);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .sc-dock-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2px 4px;
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .sc-dock-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sc-dock-btn {
+      background: transparent;
+      border: 0;
+      color: var(--ink);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      padding: 3px;
+      border-radius: 6px;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .sc-dock-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+      transform: scale(1.05);
+    }
+    .sc-iframe-wrap {
+      width: 100%;
+      height: 100px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.22);
+    }
+    .sc-iframe-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    .panel-open .scene .navigation-stage {
+      transform: translateX(calc(-26vw - 130px)) scale(.75);
+      transition: transform .9s cubic-bezier(.16,1,.3,1);
+    }
+    .panel-open .nav-item {
+      text-align: left;
+    }
+    .panel-open .scene-index {
+      font-size: 8px;
+      transform: translate(calc(-26vw - min(75px, 5.25vw) + 50px), -50%);
+      transition: transform .9s cubic-bezier(.16,1,.3,1), font-size .9s cubic-bezier(.16,1,.3,1), opacity .35s ease;
+    }
+
+    @keyframes drift {
+      from { transform: scale(1.07) translate3d(-1%, -1%, 0); }
+      to { transform: scale(1.12) translate3d(1%, 1%, 0); }
+    }
+    @keyframes breathe {
+      0%,100% { opacity: .45; transform: translateY(0); }
+      50% { opacity: .9; transform: translateY(5px); }
+    }
+    @keyframes language-crossfade {
+      0% { opacity: 0; filter: blur(7px); transform: translateY(7px) scale(.96); }
+      34% { opacity: .72; filter: blur(2px); }
+      72% { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); }
+      100% { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); }
+    }
+
+    @media (max-width: 900px) {
+      .navigation-stage { width: 62vw; }
+      .panel-open .scene .navigation-stage { transform: translateX(calc(-34vw - 110px)) scale(.72); }
+      .panel-open .scene-index { transform: translate(calc(-42.68vw + 75px), -50%); }
+      .detail-panel { right: 4%; width: 49vw; }
+    }
+
+    @media (max-width: 640px) {
+      .portfolio-shell { min-height: 560px; }
+      .topbar { padding: 20px 20px; }
+      .toggle-switch { width: 36px; height: 20px; padding: 2px; }
+      .toggle-thumb { width: 14px; height: 14px; }
+      .toggle-switch.is-on .toggle-thumb { transform: translateX(14px); }
+      .toggle-track-icons { padding: 0 3px; }
+      .footer-bar { padding: 18px 20px; }
+      .footer-center { display: none; }
+      .scene-location { left: 20px; right: auto; top: 50%; bottom: auto; transform: translateY(-50%); font-size: 8px; }
+      .navigation-stage { width: 100vw; height: 500px; }
+      .cylinder-nav { height: 420px; }
+      .nav-item span { font-size: 76px; }
+      .portfolio-shell:not(.panel-open) .nav-item:not(.is-current) span { font-size: 60.8px; }
+      .nav-hint.top { top: 58px; }
+      .nav-hint.bottom { bottom: 66px; }
+      .scene-index { right: 20px; left: auto; top: 50%; }
+      .sc-soundscape-dock {
+        right: 14px;
+        left: 14px;
+        width: auto;
+        bottom: 54px;
+      }
+      .detail-panel {
+        top: auto;
+        right: 14px;
+        bottom: 14px;
+        left: 14px;
+        width: auto;
+        height: 64%;
+        transform: translateY(30px) scale(.97);
+      }
+      .panel-open .detail-panel { transform: translateY(0) scale(1); }
+      .panel-open .scene { opacity: .25; transition: opacity .5s ease; }
+      .panel-open .scene .navigation-stage { transform: translateY(-29vh) scale(.66); }
+      .panel-open .scene-index { transform: translateY(calc(-50% - 29vh)); }
+      .panel-inner { padding: 18px; border-radius: 21px; }
+      .panel-body { padding: 3px 5px 4px; }
+      .panel-body h1 { font-size: 32px; }
+      .panel-description { margin-top: 14px; font-size: 12px; }
+      .tag-list { margin-top: 17px; }
+      .tag-list span { padding: 6px 8px; font-size: 8px; }
+      .panel-tiles-list { gap: 10px; margin-top: 15px; }
+      .panel-tile { padding: 12px 13px; border-radius: 14px; }
+      .panel-tile-title { font-size: 14px; }
+      .panel-tile-desc { font-size: 11.5px; }
+      .panel-exp-header { flex-direction: column; gap: 6px; }
+      .panel-exp-role { font-size: 14px; }
+      .panel-exp-meta { font-size: 9.5px; }
+      .panel-footer { padding-top: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef } = React;
+
+    /* =========================================================================
+     * 🛠️ PERSONAL PORTFOLIO PREFERENCES & ASSET CONFIGURATION
+     * -------------------------------------------------------------------------
+     * This portfolio is configured exclusively through this preferences block.
+     * ========================================================================= */
+    const PORTFOLIO_PREFERENCES = {
+      // Wallpaper shown in Light Mode (path or URL)
+      lightBg: 'https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?auto=format&fit=crop&w=1920&q=80',
+
+      // Wallpaper shown in Dark Mode (path or URL)
+      darkBg: 'https://images.pexels.com/photos/9348531/pexels-photo-9348531.jpeg?auto=compress&cs=tinysrgb&h=650&w=940',
+
+      // Photo displayed at the top of the 'Hello' panel (3:2 ratio)
+      helloPhoto: 'https://placehold.co/600x400/1e3d59/f5f7f6?text=3%3A2+Photo+Placeholder',
+
+      // GitHub Profile or Repository URL
+      githubUrl: 'https://github.com/kanadbose',
+
+      // Downloadable CV file path or URL
+      cvUrl: './assets/cv.pdf',
+
+      // SoundCloud Playlist or Track URL for the ambient soundscape
+      soundCloudPlaylist: 'https://soundcloud.com/kanadbose/sets/dear-visitor?si=172964870cac421fbd8544ee471fe205',
+
+      // Max background volume multiplier (60% device volume)
+      ambientVolume: 60,
+    };
+
+    const Icon = ({ size = 24, strokeWidth = 2, children, ...props }) => (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        {...props}
+      >
+        {children}
+      </svg>
+    );
+
+    const ArrowDown = (props) => <Icon {...props}><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></Icon>;
+    const ArrowUp = (props) => <Icon {...props}><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></Icon>;
+    const ArrowUpRight = (props) => <Icon {...props}><path d="M7 7h10v10"/><path d="M7 17 17 7"/></Icon>;
+    const Github = (props) => <Icon {...props}><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></Icon>;
+    const Headphones = (props) => <Icon {...props}><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></Icon>;
+    const ImageIcon = (props) => <Icon {...props}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></Icon>;
+    const Moon = (props) => <Icon {...props}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></Icon>;
+    const Pause = (props) => <Icon {...props}><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></Icon>;
+    const Sun = (props) => <Icon {...props}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></Icon>;
+    const Volume2 = (props) => <Icon {...props}><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></Icon>;
+    const VolumeX = (props) => <Icon {...props}><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></Icon>;
+    const X = (props) => <Icon {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></Icon>;
+    const Minus = (props) => <Icon {...props}><line x1="5" y1="12" x2="19" y2="12"/></Icon>;
+    const Maximize2 = (props) => <Icon {...props}><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></Icon>;
+    const Mail = (props) => <Icon {...props}><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></Icon>;
+    const Send = (props) => <Icon {...props}><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></Icon>;
+    const Check = (props) => <Icon {...props}><polyline points="20 6 9 17 4 12"/></Icon>;
+    const MapPin = (props) => <Icon {...props}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></Icon>;
+    const Linkedin = (props) => <Icon {...props}><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></Icon>;
+
+    const sections = [
+      {
+        id: 'hello',
+        label: 'Hello',
+        eyebrow: 'Economist · Data Scientist',
+        title: 'Interconnectedness, embraced with Data, Behaviour and Magic!',
+        description: 'Myself Kanad! Beyond my job, I have many titles.',
+        tags: ['Behavioural/ Experimental Economics', 'Human-centered AI', 'Visual storytelling'],
+        year: 'Based in Kharagpur, India',
+        accent: 'coral',
+      },
+      {
+        id: 'experience',
+        label: 'Experience',
+        eyebrow: 'Building with intent · 03',
+        title: 'From first principles to the final detail.',
+        description: 'I partner with small, ambitious teams to make the invisible legible — from research strategy to the last interaction.',
+        items: [
+          {
+            position: 'Behavioral Data Scientist & Strategist',
+            company: 'Applied Economics & AI Lab',
+            location: 'Kharagpur, India',
+            period: '2023 — Present',
+            description: 'Leading experimental design and causal inference frameworks to evaluate human-agent interaction in synthetic decision markets. Developing interpretability dashboards and telemetry pipelines for multi-agent dynamics.',
+            tags: ['Causal Inference', 'Agent Simulations', 'Behavioral Economics'],
+          },
+          {
+            position: 'Quantitative Economics Researcher',
+            company: 'Decision Systems Studio',
+            location: 'Bengaluru, India (Hybrid)',
+            period: '2022 — 2023',
+            description: 'Modeled bounded rationality heuristics and market micro-structures under uncertainty. Translated complex econometric models into interactive simulation prototypes for cross-functional policy teams.',
+            tags: ['Econometrics', 'Market Design', 'Interactive Viz'],
+          },
+          {
+            position: 'Data Science & Spatial Analytics Fellow',
+            company: 'Urban Informatics Lab',
+            location: 'Kolkata, India',
+            period: '2021 — 2022',
+            description: 'Engineered high-throughput geospatial analytics pipelines tracking environmental indicators across municipal sensor networks. Produced open exploratory storytelling tools for civic research.',
+            tags: ['Spatial Data', 'Python / D3.js', 'Telemetry'],
+          },
+        ],
+        tags: ['Strategy', 'Research direction', 'Creative technology'],
+        year: 'Available for select collaborations',
+        accent: 'sand',
+      },
+      {
+        id: 'projects',
+        label: 'Projects',
+        eyebrow: 'Selected explorations · 03',
+        title: 'Small tools for large questions.',
+        description: 'A collection of experiments that turn dense information into something you can feel, use, and trust.',
+        items: [
+          {
+            title: 'Signal Garden',
+            description: 'An interactive generative ecosystem translating real-time urban telemetry and environmental sensor streams into living audio-visual organisms.',
+            tags: ['Generative Web', 'WebGL', 'Audio Synthesis'],
+            link: 'https://github.com/kanadbose',
+            linkLabel: 'View work',
+          },
+          {
+            title: 'The Atlas of Air',
+            description: 'Spatial data visualization mapping micro-climate disparities, air quality shifts, and public health metrics across South Asian cities.',
+            tags: ['Data Viz', 'D3.js', 'GeoSpatial'],
+            link: 'https://github.com/kanadbose',
+            linkLabel: 'View work',
+          },
+          {
+            title: 'Lumen OS',
+            description: 'An experimental minimalist browser operating environment designed for deep focus, calm computing, and local-first memory recall.',
+            tags: ['UI Architecture', 'Local-First', 'TypeScript'],
+            link: '',
+            linkLabel: 'In Development',
+          },
+        ],
+        tags: ['Signal Garden', 'The Atlas of Air', 'Lumen OS'],
+        year: 'Three live prototypes · seven papers',
+        accent: 'blue',
+      },
+      {
+        id: 'research',
+        label: 'Research',
+        eyebrow: 'Current inquiry · 2024–2026',
+        title: 'Can a model learn to care about context?',
+        description: 'My current research looks at memory, uncertainty, and the human signals that get lost when we optimize only for scale.',
+        items: [
+          {
+            title: 'Contextual Drift in Agentic Memory',
+            description: 'Investigating how long-horizon language models accumulate behavioral bias and epistemic drift under multi-turn decision constraints.',
+            tags: ['Interpretability', 'Causal Inference'],
+            link: 'https://github.com/kanadbose',
+            linkLabel: 'Read Paper',
+          },
+          {
+            title: 'Bounded Rationality in Algorithmic Markets',
+            description: 'An empirical examination of human decision heuristics when interacting with automated pricing and predictive agents in micro-economies.',
+            tags: ['Behavioral Economics', 'Agent-Based Sim'],
+            link: 'https://github.com/kanadbose',
+            linkLabel: 'Preprint PDF',
+          },
+          {
+            title: 'Human-Centered Alignment Metrics',
+            description: 'Proposing non-linear evaluation frameworks that measure nuance, epistemic humility, and intent preservation beyond benchmark accuracy.',
+            tags: ['Model Alignment', 'Evaluation'],
+            link: '',
+            linkLabel: 'In Review',
+          },
+        ],
+        tags: ['Interpretability', 'Causal inference', 'Model alignment'],
+        year: 'Published in Nature Machine Intelligence',
+        accent: 'violet',
+      },
+      {
+        id: 'about',
+        label: 'Gallery',
+        eyebrow: 'A Polymath meets an Explorer',
+        title: 'Some fleeting moments are worth freezing.',
+        description: 'Profession aside, I consider myself an artist, and among others, Photography stands out as my forte. [Work in progress!]',
+        tags: ['Photography', 'Creativity'],
+        year: 'Top 500 Creators at wallmag.io',
+        accent: 'sage',
+      },
+      {
+        id: 'contact',
+        label: 'Contact',
+        eyebrow: "Let's make something meaningful",
+        title: 'Bring me a question worth staying up for.',
+        description: 'For research partnerships, talks, or a thoughtful hello, write to the studio. I read every note.',
+        tags: ['kanadbose@proton.me', 'linkedin.com/in/kanadbose'],
+        year: 'Replies within a few quiet days',
+        accent: 'rose',
+      },
+    ];
+
+    const translations = ['Hello', 'নমস্কার' , 'नमस्ते', 'Halo', 'もしもし', 'Hola', 'Bonjour', 'Ciao'];
+    const NAV_SPACING = 30;
+
+    function App() {
+      const [activeIndex, setActiveIndex] = useState(0);
+      const [open, setOpen] = useState(false);
+      const [closing, setClosing] = useState(false);
+      const [dark, setDark] = useState(false);
+      const [music, setMusic] = useState(false);
+      const [showPlayer, setShowPlayer] = useState(false);
+      const [languageIndex, setLanguageIndex] = useState(0);
+      const [guidanceVisible, setGuidanceVisible] = useState(true);
+      const [currentTrackTitle, setCurrentTrackTitle] = useState('');
+      const [enquiryForm, setEnquiryForm] = useState({ name: '', email: '', message: '' });
+      const [enquirySubmitted, setEnquirySubmitted] = useState(false);
+
+      const lightBg = PORTFOLIO_PREFERENCES.lightBg;
+      const darkBg = PORTFOLIO_PREFERENCES.darkBg;
+      const helloPhoto = PORTFOLIO_PREFERENCES.helloPhoto;
+      const soundCloudUrl = PORTFOLIO_PREFERENCES.soundCloudPlaylist;
+      const ambientVolume = PORTFOLIO_PREFERENCES.ambientVolume ?? 60;
+      const githubUrl = PORTFOLIO_PREFERENCES.githubUrl || 'https://github.com';
+      const cvUrl = PORTFOLIO_PREFERENCES.cvUrl || '#';
+
+      const activeIndexRef = useRef(0);
+      const prevActiveIndexRef = useRef(0);
+      const wheelLock = useRef(false);
+      const keyLock = useRef(false);
+      const touchStart = useRef(null);
+      const closeTimer = useRef(null);
+      const panelBodyRef = useRef(null);
+      const shellRef = useRef(null);
+
+      const scIframeRef = useRef(null);
+      const scWidgetRef = useRef(null);
+      const musicRef = useRef(false);
+      const userIntentMusicRef = useRef(false);
+      const playCheckTimerRef = useRef(null);
+      const isWidgetReadyRef = useRef(false);
+      const dockRef = useRef(null);
+      const autoHideTimerRef = useRef(null);
+      const guidanceTimerRef = useRef(null);
+
+      const handleEnquirySubmit = (e) => {
+        e.preventDefault();
+        const subject = encodeURIComponent(`Portfolio Inquiry from ${enquiryForm.name}`);
+        const body = encodeURIComponent(`Name: ${enquiryForm.name}\nEmail: ${enquiryForm.email}\n\nMessage:\n${enquiryForm.message}`);
+        window.open(`mailto:kanadbose@proton.me?subject=${subject}&body=${body}`, '_blank');
+        setEnquirySubmitted(true);
+      };
+
+      const resetToHome = () => {
+        if (open) {
+          setClosing(true);
+          setOpen(false);
+          if (closeTimer.current) window.clearTimeout(closeTimer.current);
+          closeTimer.current = window.setTimeout(() => {
+            setClosing(false);
+            closeTimer.current = null;
+          }, 700);
+        }
+
+        setActiveIndex(0);
+        setLanguageIndex(0);
+
+        setShowPlayer(false);
+        if (autoHideTimerRef.current) {
+          clearTimeout(autoHideTimerRef.current);
+          autoHideTimerRef.current = null;
+        }
+
+        setGuidanceVisible(true);
+        if (guidanceTimerRef.current) window.clearTimeout(guidanceTimerRef.current);
+        guidanceTimerRef.current = window.setTimeout(() => {
+          setGuidanceVisible(false);
+        }, 5000);
+      };
+
+      useEffect(() => {
+        musicRef.current = music;
+      }, [music]);
+
+      const buildScUrl = (autoPlay) => {
+        const encodedTarget = encodeURIComponent(soundCloudUrl);
+        return `https://w.soundcloud.com/player/?url=${encodedTarget}&color=%231e3d59&auto_play=${autoPlay ? 'true' : 'false'}&start_track=0&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false`;
+      };
+
+      const getWidget = () => {
+        if (scWidgetRef.current) return scWidgetRef.current;
+        if (window.SC && scIframeRef.current) {
+          try {
+            const widget = window.SC.Widget(scIframeRef.current);
+            scWidgetRef.current = widget;
+            setupWidgetEvents(widget);
+            return widget;
+          } catch (e) {
+            console.debug('Error acquiring widget:', e);
+          }
+        }
+        return null;
+      };
+
+      const setupWidgetEvents = (widget) => {
+        if (!widget || !window.SC) return;
+        try {
+          widget.bind(window.SC.Widget.Events.READY, () => {
+            isWidgetReadyRef.current = true;
+            widget.setVolume(ambientVolume);
+            if (userIntentMusicRef.current) {
+              widget.play();
+            }
+          });
+
+          widget.bind(window.SC.Widget.Events.PLAY, () => {
+            setMusic(true);
+            musicRef.current = true;
+            userIntentMusicRef.current = true;
+            widget.getCurrentSound((sound) => {
+              if (sound && sound.title) {
+                setCurrentTrackTitle(sound.title);
+              }
+            });
+          });
+
+          widget.bind(window.SC.Widget.Events.PAUSE, () => {
+            if (!userIntentMusicRef.current) {
+              setMusic(false);
+              musicRef.current = false;
+              return;
+            }
+
+            if (playCheckTimerRef.current) {
+              clearTimeout(playCheckTimerRef.current);
+            }
+            playCheckTimerRef.current = setTimeout(() => {
+              if (userIntentMusicRef.current && scWidgetRef.current) {
+                scWidgetRef.current.isPaused((paused) => {
+                  if (paused && userIntentMusicRef.current) {
+                    scWidgetRef.current.play();
+                  }
+                });
+              }
+            }, 180);
+          });
+
+          widget.bind(window.SC.Widget.Events.FINISH, () => {
+            if (userIntentMusicRef.current) {
+              setTimeout(() => {
+                if (userIntentMusicRef.current && scWidgetRef.current) {
+                  scWidgetRef.current.setVolume(ambientVolume);
+                  scWidgetRef.current.play();
+                }
+              }, 250);
+            }
+          });
+        } catch (err) {
+          console.debug('SoundCloud binding error:', err);
+        }
+      };
+
+      const handleIframeLoad = () => {
+        const widget = getWidget();
+        if (widget) {
+          widget.setVolume(ambientVolume);
+          if (userIntentMusicRef.current) {
+            widget.play();
+          }
+        }
+      };
+
+      useEffect(() => {
+        const timer = window.setTimeout(() => {
+          getWidget();
+        }, 350);
+        return () => window.clearTimeout(timer);
+      }, []);
+
+      useEffect(() => {
+        if (!showPlayer) return;
+
+        const handleClickOutside = (e) => {
+          if (dockRef.current && dockRef.current.contains(e.target)) {
+            return;
+          }
+          if (e.target.closest && (e.target.closest('.sound-toggle') || e.target.closest('.footer-sound-link'))) {
+            return;
+          }
+          setShowPlayer(false);
+          if (autoHideTimerRef.current) {
+            clearTimeout(autoHideTimerRef.current);
+            autoHideTimerRef.current = null;
+          }
+        };
+
+        const timer = window.setTimeout(() => {
+          document.addEventListener('pointerdown', handleClickOutside);
+        }, 50);
+
+        return () => {
+          window.clearTimeout(timer);
+          document.removeEventListener('pointerdown', handleClickOutside);
+        };
+      }, [showPlayer]);
+
+      const toggleSoundscape = () => {
+        const nextMusic = !music;
+        setMusic(nextMusic);
+        musicRef.current = nextMusic;
+        userIntentMusicRef.current = nextMusic;
+
+        if (autoHideTimerRef.current) {
+          clearTimeout(autoHideTimerRef.current);
+          autoHideTimerRef.current = null;
+        }
+        if (playCheckTimerRef.current) {
+          clearTimeout(playCheckTimerRef.current);
+          playCheckTimerRef.current = null;
+        }
+
+        if (nextMusic) {
+          setShowPlayer(true);
+
+          autoHideTimerRef.current = setTimeout(() => {
+            setShowPlayer(false);
+            autoHideTimerRef.current = null;
+          }, 5000);
+
+          const widget = getWidget();
+          if (widget) {
+            try {
+              widget.setVolume(ambientVolume);
+              widget.play();
+
+              playCheckTimerRef.current = setTimeout(() => {
+                if (userIntentMusicRef.current && widget) {
+                  widget.isPaused((paused) => {
+                    if (paused && userIntentMusicRef.current) {
+                      widget.play();
+                    }
+                  });
+                }
+              }, 400);
+            } catch (err) {
+              console.debug('SoundCloud play error:', err);
+            }
+          }
+        } else {
+          setShowPlayer(false);
+          const widget = getWidget();
+          if (widget) {
+            try {
+              widget.pause();
+            } catch (err) {
+              console.debug('SoundCloud pause error:', err);
+            }
+          }
+        }
+      };
+
+      const activeSection = sections[activeIndex];
+
+      useEffect(() => {
+        activeIndexRef.current = activeIndex;
+        prevActiveIndexRef.current = activeIndex;
+        if (panelBodyRef.current) {
+          panelBodyRef.current.scrollTop = 0;
+        }
+      }, [activeIndex]);
+
+      useEffect(() => {
+        const interval = window.setInterval(() => {
+          if (activeIndex === 0) {
+            setLanguageIndex((current) => (current + 1) % translations.length);
+          }
+        }, 3200);
+        return () => window.clearInterval(interval);
+      }, [activeIndex]);
+
+      useEffect(() => {
+        guidanceTimerRef.current = window.setTimeout(() => setGuidanceVisible(false), 5000);
+        return () => {
+          if (guidanceTimerRef.current) window.clearTimeout(guidanceTimerRef.current);
+        };
+      }, []);
+
+      useEffect(() => {
+        const handleKeyDown = (e) => {
+          if (e.key === 'Escape' && open) {
+            e.preventDefault();
+            closePanel();
+            return;
+          }
+
+          const isEnter = e.key === 'Enter' || e.code === 'Enter' || e.keyCode === 13;
+          if (isEnter) {
+            const activeEl = document.activeElement;
+            const isTextInput = activeEl && (
+              (activeEl.tagName === 'INPUT' && !['file', 'checkbox', 'radio', 'button', 'submit', 'reset'].includes(activeEl.type)) ||
+              activeEl.tagName === 'TEXTAREA' ||
+              activeEl.isContentEditable
+            );
+            if (isTextInput) return;
+
+            if (activeEl && (
+              activeEl.closest('.wordmark') ||
+              activeEl.closest('.top-actions') || 
+              (open && activeEl.closest('.detail-panel'))
+            )) {
+              return;
+            }
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (activeEl && activeEl.hasAttribute('data-index')) {
+              const targetIdx = parseInt(activeEl.getAttribute('data-index'), 10);
+              if (!isNaN(targetIdx)) {
+                setActiveIndex(targetIdx);
+              }
+            }
+
+            setGuidanceVisible(false);
+            setClosing(false);
+            setOpen(true);
+            return;
+          }
+
+          const isDown = e.key === 'ArrowDown' || e.key === 'Down' || e.code === 'ArrowDown' || e.keyCode === 40;
+          const isUp = e.key === 'ArrowUp' || e.key === 'Up' || e.code === 'ArrowUp' || e.keyCode === 38;
+
+          if (isDown || isUp) {
+            const activeEl = document.activeElement;
+            const isTextInput = activeEl && (
+              (activeEl.tagName === 'INPUT' && !['file', 'checkbox', 'radio', 'button', 'submit', 'reset'].includes(activeEl.type)) ||
+              activeEl.tagName === 'TEXTAREA' ||
+              activeEl.isContentEditable
+            );
+            if (isTextInput) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (activeEl && (activeEl.tagName === 'BUTTON' || activeEl.tagName === 'A')) {
+              activeEl.blur();
+            }
+
+            if (keyLock.current) return;
+            keyLock.current = true;
+            move(isDown ? 1 : -1);
+            window.setTimeout(() => {
+              keyLock.current = false;
+            }, 280);
+          }
+        };
+
+        window.addEventListener('keydown', handleKeyDown, true);
+        document.addEventListener('keydown', handleKeyDown, true);
+        return () => {
+          window.removeEventListener('keydown', handleKeyDown, true);
+          document.removeEventListener('keydown', handleKeyDown, true);
+        };
+      }, [open, activeIndex]);
+
+      useEffect(() => () => {
+        if (closeTimer.current) window.clearTimeout(closeTimer.current);
+        if (playCheckTimerRef.current) window.clearTimeout(playCheckTimerRef.current);
+      }, []);
+
+      const move = (direction) => {
+        setGuidanceVisible(false);
+        setActiveIndex((current) => (current + direction + sections.length) % sections.length);
+      };
+
+      const closePanel = () => {
+        setClosing(true);
+        setOpen(false);
+        if (closeTimer.current) window.clearTimeout(closeTimer.current);
+        closeTimer.current = window.setTimeout(() => {
+          setClosing(false);
+          closeTimer.current = null;
+        }, 700);
+      };
+
+      const handleWheel = (event) => {
+        event.preventDefault();
+        setGuidanceVisible(false);
+        if (wheelLock.current) return;
+        wheelLock.current = true;
+        move(event.deltaY > 0 ? 1 : -1);
+        window.setTimeout(() => {
+          wheelLock.current = false;
+        }, 750);
+      };
+
+      const navItems = useMemo(() => {
+        const half = Math.floor(sections.length / 2);
+        return sections.map((section, i) => {
+          let offset = i - activeIndex;
+          if (offset > half) offset -= sections.length;
+          if (offset < -half) offset += sections.length;
+
+          let prevOffset = i - prevActiveIndexRef.current;
+          if (prevOffset > half) prevOffset -= sections.length;
+          if (prevOffset < -half) prevOffset += sections.length;
+
+          const absOffset = Math.abs(offset);
+          const absPrevOffset = Math.abs(prevOffset);
+
+          const isFadingOut = absOffset > absPrevOffset;
+          const isFadingIn = absOffset < absPrevOffset;
+
+          return { ...section, index: i, offset, isFadingOut, isFadingIn };
+        });
+      }, [activeIndex]);
+
+      return (
+        <main
+          ref={shellRef}
+          tabIndex={0}
+          className={`portfolio-shell ${dark ? 'is-dark' : ''} ${open ? 'panel-open' : ''} ${closing ? 'is-closing' : ''}`}
+        >
+          <div className="atmosphere" style={{ backgroundImage: `url(${dark ? darkBg : lightBg})` }} />
+          <div className="grain" />
+          
+          <header className="topbar">
+            <button
+              type="button"
+              className="wordmark"
+              onClick={resetToHome}
+              aria-label="Return to home screen"
+              title="Return to home screen"
+            >
+              <span>Kanad Bose</span>
+            </button>
+            <div className="top-actions">
+              <button
+                className={`toggle-switch theme-toggle ${dark ? 'is-on' : ''}`}
+                role="switch"
+                aria-checked={dark}
+                aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+                title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+                onClick={() => setDark((current) => !current)}
+              >
+                <div className="toggle-track-icons">
+                  <Sun size={8} strokeWidth={2} />
+                  <Moon size={8} strokeWidth={2} />
+                </div>
+                <div className="toggle-thumb">
+                  {dark ? <Moon size={9} strokeWidth={2.2} /> : <Sun size={9} strokeWidth={2.2} />}
+                </div>
+              </button>
+
+              <button
+                className={`toggle-switch sound-toggle ${music ? 'is-on' : ''}`}
+                role="switch"
+                aria-checked={music}
+                aria-label={music ? 'Turn off soundscape' : 'Turn on soundscape'}
+                title={music ? 'Turn off soundscape' : 'Turn on soundscape'}
+                onClick={toggleSoundscape}
+              >
+                <div className="toggle-track-icons">
+                  <VolumeX size={8} strokeWidth={2} />
+                  <Volume2 size={8} strokeWidth={2} />
+                </div>
+                <div className="toggle-thumb">
+                  {music ? <Volume2 size={9} strokeWidth={2.2} /> : <VolumeX size={9} strokeWidth={2.2} />}
+                </div>
+              </button>
+            </div>
+          </header>
+
+          {}
+          <section className="scene" onWheel={handleWheel} onTouchStart={(event) => { touchStart.current = event.touches[0].clientY; }} onTouchEnd={(event) => {
+            if (touchStart.current === null || wheelLock.current) return;
+            const distance = touchStart.current - event.changedTouches[0].clientY;
+            if (Math.abs(distance) > 30) {
+              wheelLock.current = true;
+              move(distance > 0 ? 1 : -1);
+              window.setTimeout(() => { wheelLock.current = false; }, 680);
+            }
+            touchStart.current = null;
+          }}>
+            <div className="navigation-stage">
+              <div className={`nav-hint top ${guidanceVisible ? '' : 'is-hidden'}`}><ArrowUp size={14} /><span>Scroll to explore</span></div>
+              <nav className="cylinder-nav" aria-label="Portfolio sections">
+                {navItems.map((item) => {
+                  const label = item.id === 'hello' ? translations[languageIndex] : item.label;
+                  const absOffset = Math.abs(item.offset);
+                  const top = 50 + item.offset * NAV_SPACING;
+                  const scale = absOffset === 0 ? 1 : absOffset === 1 ? 0.62 : 0.38;
+                  const opacity = absOffset === 0 ? 1 : absOffset === 1 ? 0.65 : 0;
+                  const opacityDuration = item.isFadingOut ? '0.2s' : '1.2s';
+                  return (
+                    <button
+                      key={item.id}
+                      data-index={item.index}
+                      className={`nav-item ${item.offset === 0 ? 'is-current' : ''} ${item.isFadingOut ? 'is-fading-out' : 'is-fading-in'}`}
+                      style={{
+                        top: `${top}%`,
+                        transform: `translateX(${open ? '0' : '-50%'}) translateY(-50%) scale(${scale})`,
+                        opacity,
+                        zIndex: 3 - absOffset,
+                        transition: `top .7s cubic-bezier(.22,.8,.2,1), transform ${open ? '.9s' : '.70s'} cubic-bezier(.16,1,.3,1), opacity ${opacityDuration} ease, color .7s ease, filter .7s ease`
+                      }}
+                      onClick={() => {
+                        setGuidanceVisible(false);
+                        if (item.offset !== 0) move(item.offset > 0 ? 1 : -1);
+                        else {
+                          setClosing(false);
+                          setOpen(true);
+                        }
+                      }}
+                    >
+                      <span key={`${item.id}-${item.id === 'hello' ? languageIndex : 'static'}`} className={item.id === 'hello' ? 'language-word' : undefined}>{label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
+              <div className={`nav-hint bottom ${guidanceVisible ? '' : 'is-hidden'}`}><span>Choose a direction</span><ArrowDown size={14} /></div>
+            </div>
+
+            <div className="scene-location"><span /> Shot from Nottingham, UK</div>
+            <div className="scene-index"><span>0{activeIndex + 1}</span><i /> <span>06</span></div>
+          </section>
+
+          {}
+          <aside className="detail-panel" aria-hidden={!open}>
+            <div className="panel-inner">
+              <div className="panel-topline">
+                <span>{activeSection.eyebrow}</span>
+                <div className="panel-top-actions">
+                  <a
+                    href={githubUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="panel-action-btn"
+                    title="View GitHub (opens in new tab)"
+                    aria-label="View GitHub"
+                  >
+                    <Github size={14} />
+                  </a>
+                  <a
+                    href={cvUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="panel-action-btn panel-cv-btn"
+                    title="Open / Download CV (opens in new tab)"
+                    aria-label="Open CV"
+                  >
+                    CV
+                  </a>
+                  <button className="close-button" onClick={closePanel} aria-label="Close panel">
+                    <X size={15} />
+                  </button>
+                </div>
+              </div>
+
+              {}
+              <div className="panel-body" ref={panelBodyRef}>
+                {activeSection.id === 'hello' && (
+                  <div className="hello-photo-uploader" title="Configured in PORTFOLIO_PREFERENCES">
+                    <img src={helloPhoto} alt="Kanad Bose" />
+                  </div>
+                )}
+                <h1>{activeSection.title}</h1>
+                <p className="panel-description">{activeSection.description}</p>
+
+                {activeSection.id === 'contact' ? (
+                  <>
+                    <div className="contact-links-group">
+                      <a
+                        href="mailto:kanadbose@proton.me"
+                        className="contact-pill-link"
+                        title="Send email to kanadbose@proton.me"
+                      >
+                        <Mail size={12} strokeWidth={2} />
+                        <span>kanadbose@proton.me</span>
+                      </a>
+                      <a
+                        href="https://linkedin.com/in/kanadbose"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="contact-pill-link"
+                        title="linkedin.com/in/kanadbose (opens in new tab)"
+                      >
+                        <Linkedin size={12} strokeWidth={2} />
+                        <span>/kanadbose</span>
+                      </a>
+                    </div>
+
+                    {enquirySubmitted ? (
+                      <div className="enquiry-success-box">
+                        <div className="enquiry-success-title">
+                          <Check size={14} strokeWidth={2.5} />
+                          <span>Note Composed</span>
+                        </div>
+                        <p style={{ margin: '0 0 10px 0', opacity: 0.85 }}>
+                          Thank you for reaching out{enquiryForm.name ? `, ${enquiryForm.name}` : ''}. Your note has been queued. If your email app hasn't opened automatically, you can write directly to <strong>kanadbose@proton.me</strong>.
+                        </p>
+                        <button
+                          type="button"
+                          className="enquiry-send-btn"
+                          onClick={() => {
+                            setEnquirySubmitted(false);
+                            setEnquiryForm({ name: '', email: '', message: '' });
+                          }}
+                        >
+                          Send another note
+                        </button>
+                      </div>
+                    ) : (
+                      <form className="enquiry-form-card" onSubmit={handleEnquirySubmit}>
+                        <div className="enquiry-form-header">
+                          <span>Send a quick note</span>
+                        </div>
+                        <div className="enquiry-input-grid">
+                          <input
+                            type="text"
+                            className="enquiry-text-input"
+                            placeholder="Your Name"
+                            required
+                            value={enquiryForm.name}
+                            onChange={(e) => setEnquiryForm({ ...enquiryForm, name: e.target.value })}
+                          />
+                          <input
+                            type="email"
+                            className="enquiry-text-input"
+                            placeholder="Your Email"
+                            required
+                            value={enquiryForm.email}
+                            onChange={(e) => setEnquiryForm({ ...enquiryForm, email: e.target.value })}
+                          />
+                        </div>
+                        <textarea
+                          className="enquiry-textarea"
+                          placeholder="Your question, collaboration proposal, or message..."
+                          required
+                          value={enquiryForm.message}
+                          onChange={(e) => setEnquiryForm({ ...enquiryForm, message: e.target.value })}
+                        />
+                        <div className="enquiry-actions">
+                          <button type="submit" className="enquiry-send-btn">
+                            <span>Send Note</span>
+                            <Send size={11} strokeWidth={2} />
+                          </button>
+                        </div>
+                      </form>
+                    )}
+                  </>
+                ) : activeSection.id === 'experience' && activeSection.items && activeSection.items.length > 0 ? (
+                  <div className="panel-tiles-list">
+                    {activeSection.items.map((item, idx) => (
+                      <div className="panel-tile" key={idx}>
+                        <div className="panel-exp-header">
+                          <div>
+                            <h2 className="panel-exp-role">{item.position}</h2>
+                            <div className="panel-exp-meta">
+                              <span className="panel-exp-company">{item.company}</span>
+                              <span className="panel-exp-dot">·</span>
+                              <span className="panel-exp-location">
+                                <MapPin size={10} strokeWidth={2} />
+                                {item.location}
+                              </span>
+                            </div>
+                          </div>
+                          <span className="panel-exp-period">{item.period}</span>
+                        </div>
+                        <p className="panel-tile-desc panel-exp-desc">{item.description}</p>
+                        {item.tags && item.tags.length > 0 && (
+                          <div className="panel-tile-tags">
+                            {item.tags.map((tag) => (
+                              <span key={tag}>{tag}</span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : activeSection.items && activeSection.items.length > 0 ? (
+                  <div className="panel-tiles-list">
+                    {activeSection.items.map((item, idx) => (
+                      <div className="panel-tile" key={idx}>
+                        <div className="panel-tile-header">
+                          <h2 className="panel-tile-title">{item.title}</h2>
+                          {item.link ? (
+                            <a
+                              href={item.link}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="panel-tile-link"
+                              title={`View ${item.title} work (opens in new tab)`}
+                            >
+                              <span>{item.linkLabel || 'View work'}</span>
+                              <ArrowUpRight size={11} strokeWidth={2.2} />
+                            </a>
+                          ) : item.linkLabel ? (
+                            <span className="panel-tile-badge">{item.linkLabel}</span>
+                          ) : null}
+                        </div>
+                        <p className="panel-tile-desc">{item.description}</p>
+                        {item.tags && item.tags.length > 0 && (
+                          <div className="panel-tile-tags">
+                            {item.tags.map((tag) => (
+                              <span key={tag}>{tag}</span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="tag-list">
+                    {activeSection.tags.map((tag) => <span key={tag}>{tag}</span>)}
+                  </div>
+                )}
+
+                <div className="panel-footer">
+                  <span>{activeSection.year}</span>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {}
+          <footer className="footer-bar">
+            <span className={`scroll-hint ${guidanceVisible ? '' : 'is-visible'}`}>Scroll / swipe</span>
+            <span className="footer-center">© 2026 Kanad Bose</span>
+            <span>
+              <button
+                className="footer-sound-link"
+                onClick={() => {
+                  if (!music) {
+                    toggleSoundscape();
+                  } else {
+                    setShowPlayer((prev) => {
+                      const next = !prev;
+                      if (autoHideTimerRef.current) {
+                        clearTimeout(autoHideTimerRef.current);
+                        autoHideTimerRef.current = null;
+                      }
+                      if (next) {
+                        autoHideTimerRef.current = setTimeout(() => {
+                          setShowPlayer(false);
+                          autoHideTimerRef.current = null;
+                        }, 5000);
+                      }
+                      return next;
+                    });
+                  }
+                }}
+                title={showPlayer ? 'Click to close player' : (music ? 'Click to open player' : 'Click to turn on soundscape')}
+              >
+                {music ? (
+                  <>
+                    <Pause size={12} /> {currentTrackTitle ? (currentTrackTitle.length > 24 ? currentTrackTitle.substring(0, 24) + '…' : currentTrackTitle) : 'Starting soundscape…'}
+                  </>
+                ) : (
+                  <>
+                    <Headphones size={12} /> Silent mode
+                  </>
+                )}
+              </button>
+            </span>
+          </footer>
+
+          {}
+          <div
+            ref={dockRef}
+            className={`sc-soundscape-dock ${!showPlayer ? 'is-hidden' : ''}`}
+            onMouseEnter={() => {
+              if (autoHideTimerRef.current) {
+                clearTimeout(autoHideTimerRef.current);
+                autoHideTimerRef.current = null;
+              }
+            }}
+          >
+            <div className="sc-dock-header">
+              <span>Dear Visitor · Soundscape</span>
+              <div className="sc-dock-controls">
+                <button
+                  className="sc-dock-btn"
+                  onClick={() => setShowPlayer(false)}
+                  aria-label="Close soundscape player"
+                  title="Close player"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            </div>
+
+            <div className="sc-iframe-wrap">
+              <iframe
+                id="sc-soundscape-player"
+                ref={scIframeRef}
+                title="SoundCloud Soundscape Player"
+                onLoad={handleIframeLoad}
+                allow="autoplay; encrypted-media; clipboard-write"
+                src={buildScUrl(false)}
+              />
+            </div>
+          </div>
+        </main>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
