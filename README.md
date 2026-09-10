@@ -1,2 +1,2 @@
 # kanadbose.github.io
-This is my portfolio website
+All rights reserved by Kanad Bose (2026)
