@@ -8,13 +8,13 @@
   <!-- Website Thumbnail & Open Graph Meta Tags -->
   <meta property="og:title" content="Kanad Bose — Portfolio" />
   <meta property="og:description" content="Economist · Data Scientist. Interconnectedness, embraced with Data, Behaviour and Magic." />
-  <meta property="og:image" id="meta-og-image" content="https://placehold.co/1200x630/1e3d59/f5f7f6?text=Kanad+Bose+Portfolio" />
+  <meta property="og:image" id="meta-og-image" content="https://kanadbose.github.io/Images/social-card.jpg" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Kanad Bose — Portfolio" />
   <meta name="twitter:description" content="Economist · Data Scientist" />
-  <meta name="twitter:image" id="meta-twitter-image" content="https://placehold.co/1200x630/1e3d59/f5f7f6?text=Kanad+Bose+Portfolio" />
-  <link rel="icon" id="site-favicon" href="https://placehold.co/64x64/1e3d59/ffffff?text=KB" />
+  <meta name="twitter:image" id="meta-twitter-image" content="https://kanadbose.github.io/Images/social-card.jpg" />
+  <link rel="icon" id="site-favicon" href="Images/favicon.svg" type="image/svg+xml" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,7 +36,10 @@
     * { box-sizing: border-box; }
     html, body, #root { width: 100%; min-height: 100%; margin: 0; padding: 0; }
     body { overflow: hidden; }
-    button, a { font: inherit; color: inherit; }
+    button, a { font: inherit; color: inherit; -webkit-tap-highlight-color: transparent; }
+    ::selection { background: rgba(245, 247, 246, .28); color: #fff; }
+    :focus:not(:focus-visible) { outline: none; }
+    :focus-visible { outline: 1px solid rgba(255, 255, 255, .6); outline-offset: 3px; border-radius: 6px; }
     button { border: 0; cursor: pointer; }
 
     .portfolio-shell {
@@ -52,6 +55,10 @@
       background: #1e3d59;
       isolation: isolate;
       transition: background .7s ease;
+      animation: shell-enter 1.2s cubic-bezier(.16,1,.3,1) both;
+    }
+    .portfolio-shell:focus-visible {
+      outline: none;
     }
     .portfolio-shell.is-dark {
       --ink: #e9eeee;
@@ -279,6 +286,9 @@
       background: transparent;
       text-align: center;
       white-space: nowrap;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
       transition: top .7s cubic-bezier(.22,.8,.2,1), transform .70s cubic-bezier(.16,1,.3,1), opacity 1.2s ease, color .7s ease, filter .7s ease;
     }
     .nav-item.is-fading-out {
@@ -301,6 +311,7 @@
       backface-visibility: hidden;
       transform: translateZ(0);
       filter: none;
+      transition: text-shadow .35s ease;
       /* Crisp contours with 90% luminous glow */
       text-shadow:
         0 0 20px rgba(255, 255, 255, 0.9),
@@ -312,6 +323,22 @@
       text-shadow:
         0 0 26px rgba(255, 255, 255, 0.9),
         0 0 56px rgba(255, 255, 255, 0.5);
+    }
+
+    /* Press / keyboard focus: the glow blooms instead of a selection box */
+    .nav-item:focus-visible {
+      outline: none;
+    }
+    .nav-item:active span,
+    .nav-item:focus-visible span {
+      text-shadow:
+        0 0 30px rgba(255, 255, 255, 1),
+        0 0 72px rgba(255, 255, 255, 0.65);
+    }
+    @media (hover: hover) {
+      .nav-item:not(.is-current):hover {
+        color: rgba(255,255,255,.95);
+      }
     }
 
     .is-dark .nav-item span {
@@ -400,9 +427,23 @@
       transition: transform .70s cubic-bezier(.16,1,.3,1), font-size .70s cubic-bezier(.16,1,.3,1), opacity .35s ease;
     }
     .scene-index i {
+      position: relative;
       width: 1px;
       height: 42px;
       background: var(--line);
+    }
+    /* Position marker. --progress is 0..1, set inline from the active section */
+    .scene-index i::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: calc(var(--progress, 0) * 100%);
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--ink);
+      transform: translate(-50%, -50%);
+      transition: top .7s cubic-bezier(.16,1,.3,1);
     }
 
     .footer-bar {
@@ -583,6 +624,13 @@
       border-radius: 99px;
       background: rgba(255,255,255,.42);
     }
+    .panel-open .panel-body > * {
+      animation: panel-rise .7s cubic-bezier(.16,1,.3,1) both;
+    }
+    .panel-open .panel-body > :nth-child(2) { animation-delay: .05s; }
+    .panel-open .panel-body > :nth-child(3) { animation-delay: .10s; }
+    .panel-open .panel-body > :nth-child(4) { animation-delay: .15s; }
+    .panel-open .panel-body > :nth-child(n+5) { animation-delay: .20s; }
 
     .hello-photo-uploader {
       display: block;
@@ -1119,6 +1167,23 @@
       0%,100% { opacity: .45; transform: translateY(0); }
       50% { opacity: .9; transform: translateY(5px); }
     }
+    @keyframes shell-enter {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes panel-rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .portfolio-shell,
+      .atmosphere,
+      .nav-hint,
+      .language-word,
+      .panel-open .panel-body > * {
+        animation: none !important;
+      }
+    }
 
     /* =========================================================================
      * 📱 MOBILE & PORTRAIT MODE SPECIFIC RULES
@@ -1377,10 +1442,10 @@
       helloPhoto: 'Images/about.jpeg',
 
       // Website social thumbnail / link preview image (Open Graph & Twitter card, 1200x630 recommended)
-      siteThumbnail: 'https://placehold.co/1200x630/1e3d59/f5f7f6?text=Kanad+Bose+Portfolio',
+      siteThumbnail: 'https://kanadbose.github.io/Images/social-card.jpg',
 
       // Favicon icon displayed in browser tabs & bookmarks (.ico, .png, or .svg)
-      favicon: 'https://placehold.co/64x64/1e3d59/ffffff?text=KB',
+      favicon: 'Images/favicon.svg',
 
       // GitHub Profile or Repository URL
       githubUrl: 'https://github.com/kanadbose',
@@ -2152,7 +2217,7 @@
 
             <div className="scene-index">
               <span>0{activeIndex + 1}</span>
-              <i />
+              <i style={{ '--progress': activeIndex / Math.max(1, sections.length - 1) }} />
               <span>0{sections.length}</span>
             </div>
           </section>
@@ -2190,7 +2255,7 @@
                 </div>
               </div>
 
-              <div className="panel-body" ref={panelBodyRef}>
+              <div className="panel-body" ref={panelBodyRef} key={activeSection.id}>
                 {activeSection.id === 'hello' && (
                   <div className="hello-photo-uploader">
                     <img src={helloPhoto} alt="Kanad Bose" decoding="async" />
