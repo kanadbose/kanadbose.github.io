@@ -16,13 +16,14 @@
   <meta name="twitter:image" id="meta-twitter-image" content="https://placehold.co/1200x630/1e3d59/f5f7f6?text=Kanad+Bose+Portfolio" />
   <link rel="icon" id="site-favicon" href="https://placehold.co/64x64/1e3d59/ffffff?text=KB" />
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://w.soundcloud.com/player/api.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Keep in sync with PORTFOLIO_PREFERENCES.lightBg so the wallpaper starts downloading before React boots -->
+  <link rel="preload" as="image" href="Images/IMG_2552.jpg">
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@8.1.1/babel.min.js"></script>
+  <script src="https://w.soundcloud.com/player/api.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Geom:ital,wght@0,300..900;1,300..900&family=Manrope:wght@400;500;600;700&family=SUSE+Mono:ital,wght@0,100..800;1,100..800&family=SUSE:ital,wght@0,100..800;1,100..800&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
   
   <style>
@@ -68,12 +69,18 @@
       filter: saturate(.88) contrast(1.02) brightness(1.02);
       transform: scale(1.07);
       opacity: .92;
-      transition: filter .8s ease, opacity .8s ease, background-image .8s ease;
+      transition: opacity .8s ease;
       animation: drift 22s ease-in-out infinite alternate;
     }
-    .is-dark .atmosphere {
+    .atmosphere-dark {
       filter: saturate(1.1) contrast(1.2) brightness(.50) hue-rotate(7deg);
-      opacity: 1.00;
+      opacity: 0;
+    }
+    .is-dark .atmosphere-light {
+      opacity: 0;
+    }
+    .is-dark .atmosphere-dark {
+      opacity: 1;
     }
     .atmosphere::after {
       content: '';
@@ -1116,6 +1123,9 @@
     /* =========================================================================
      * 📱 MOBILE & PORTRAIT MODE SPECIFIC RULES
      * ========================================================================= */
+    .portfolio-shell.is-mobile-mode {
+      min-height: 0;
+    }
     .is-mobile-mode .topbar {
       padding: max(16px, env(safe-area-inset-top, 16px)) max(18px, env(safe-area-inset-right, 18px)) 12px max(18px, env(safe-area-inset-left, 18px));
       z-index: 35;
@@ -1195,6 +1205,10 @@
       opacity: 0 !important;
       pointer-events: none;
       transform: translate(-50%, 26px) !important;
+    }
+    /* Landscape phones: the caption would sit on top of the bottom nav word */
+    @media (max-height: 500px) {
+      .is-mobile-mode .scene-location { display: none; }
     }
 
     .is-mobile-mode .scene-index {
@@ -1371,8 +1385,8 @@
       // GitHub Profile or Repository URL
       githubUrl: 'https://github.com/kanadbose',
 
-      // Downloadable CV file path or URL
-      cvUrl: './assets/cv.pdf',
+      // Downloadable CV file path or URL (leave empty to hide the CV button)
+      cvUrl: '',
 
       // SoundCloud Playlist or Track URL for the ambient soundscape
       soundCloudPlaylist: 'https://soundcloud.com/kanadbose/sets/dear-visitor?si=172964870cac421fbd8544ee471fe205',
@@ -1596,7 +1610,7 @@
       const soundCloudUrl = PORTFOLIO_PREFERENCES.soundCloudPlaylist;
       const ambientVolume = PORTFOLIO_PREFERENCES.ambientVolume ?? 60;
       const githubUrl = PORTFOLIO_PREFERENCES.githubUrl || 'https://github.com';
-      const cvUrl = PORTFOLIO_PREFERENCES.cvUrl || '#';
+      const cvUrl = PORTFOLIO_PREFERENCES.cvUrl || '';
 
       const activeIndexRef = useRef(0);
       const prevActiveIndexRef = useRef(0);
@@ -1648,20 +1662,12 @@
         e.preventDefault();
         const subject = encodeURIComponent(`Portfolio Inquiry from ${enquiryForm.name}`);
         const body = encodeURIComponent(`Name: ${enquiryForm.name}\nEmail: ${enquiryForm.email}\n\nMessage:\n${enquiryForm.message}`);
-        window.open(`mailto:kanadbose@proton.me?subject=${subject}&body=${body}`, '_blank');
+        window.location.href = `mailto:kanadbose@proton.me?subject=${subject}&body=${body}`;
         setEnquirySubmitted(true);
       };
 
       const resetToHome = () => {
-        if (open) {
-          setClosing(true);
-          setOpen(false);
-          if (closeTimer.current) window.clearTimeout(closeTimer.current);
-          closeTimer.current = window.setTimeout(() => {
-            setClosing(false);
-            closeTimer.current = null;
-          }, 700);
-        }
+        if (open) closePanel();
 
         setActiveIndex(0);
         setLanguageIndex(0);
@@ -1956,10 +1962,8 @@
         };
 
         window.addEventListener('keydown', handleKeyDown, true);
-        document.addEventListener('keydown', handleKeyDown, true);
         return () => {
           window.removeEventListener('keydown', handleKeyDown, true);
-          document.removeEventListener('keydown', handleKeyDown, true);
         };
       }, [open, activeIndex]);
 
@@ -2002,7 +2006,7 @@
       };
 
       const handleWheel = (event) => {
-        event.preventDefault();
+        if (Math.abs(event.deltaY) < 4 || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
         setGuidanceVisible(false);
         if (wheelLock.current) return;
         wheelLock.current = true;
@@ -2039,7 +2043,8 @@
           tabIndex={0}
           className={`portfolio-shell ${isMobile ? 'is-mobile-mode' : 'is-desktop-mode'} ${dark ? 'is-dark' : ''} ${open ? 'panel-open' : ''} ${closing ? 'is-closing' : ''}`}
         >
-          <div className="atmosphere" style={{ backgroundImage: `url(${dark ? darkBg : lightBg})` }} />
+          <div className="atmosphere atmosphere-light" style={{ backgroundImage: `url(${lightBg})` }} />
+          <div className="atmosphere atmosphere-dark" style={{ backgroundImage: `url(${darkBg})` }} />
           <div className="grain" />
           
           <header className="topbar">
@@ -2167,16 +2172,18 @@
                   >
                     <Github size={14} />
                   </a>
-                  <a
-                    href={cvUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="panel-action-btn panel-cv-btn"
-                    title="Open / Download CV (opens in new tab)"
-                    aria-label="Open CV"
-                  >
-                    CV
-                  </a>
+                  {cvUrl && (
+                    <a
+                      href={cvUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="panel-action-btn panel-cv-btn"
+                      title="Open / Download CV (opens in new tab)"
+                      aria-label="Open CV"
+                    >
+                      CV
+                    </a>
+                  )}
                   <button className="close-button" onClick={closePanel} aria-label="Close panel">
                     <X size={15} />
                   </button>
@@ -2185,8 +2192,8 @@
 
               <div className="panel-body" ref={panelBodyRef}>
                 {activeSection.id === 'hello' && (
-                  <div className="hello-photo-uploader" title="Configured in PORTFOLIO_PREFERENCES">
-                    <img src={helloPhoto} alt="Kanad Bose" />
+                  <div className="hello-photo-uploader">
+                    <img src={helloPhoto} alt="Kanad Bose" decoding="async" />
                   </div>
                 )}
                 <h1>{activeSection.title}</h1>
@@ -2243,6 +2250,8 @@
                         <div className="enquiry-input-grid">
                           <input
                             type="text"
+                            name="name"
+                            autoComplete="name"
                             className="enquiry-text-input"
                             placeholder="Your Name"
                             required
@@ -2251,6 +2260,8 @@
                           />
                           <input
                             type="email"
+                            name="email"
+                            autoComplete="email"
                             className="enquiry-text-input"
                             placeholder="Your Email"
                             required
@@ -2259,6 +2270,7 @@
                           />
                         </div>
                         <textarea
+                          name="message"
                           className="enquiry-textarea"
                           placeholder="Your question, collaboration proposal, or message..."
                           required
